@@ -1,0 +1,57 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Quem Sou Eu CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate SHA
+        id: generate_sha
+        run: |
+          SHA=$(echo $GITHUB_SHA | head -c7)
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+
+      - name: Build docker image for qse
+        run: docker build -t domzinhuu/qse:${{steps.generate_sha.outputs.sha}} .
+
+      - name: Build docker image for webosocker-qse
+        run: docker build -f ws.Dockerfile -t domzinhuu/ws-qse:${{steps.generate_sha.outputs.sha}} .
+
+      - name: Docker Login
+        uses: docker/login-action@v3.1.0
+        with:
+          username: ${{secrets.DOCKERHUB_USERNAME}}
+          password: ${{secrets.DOCKERHUB_TOKEN}}
+
+      - name: Push image
+        run: |
+          docker push domzinhuu/qse:${{steps.generate_sha.outputs.sha}}
+          docker push domzinhuu/ws-qse:${{steps.generate_sha.outputs.sha}}
+          docker tag domzinhuu/qse:${{steps.generate_sha.outputs.sha}} domzinhuu/qse:latest
+          docker tag domzinhuu/ws-qse:${{steps.generate_sha.outputs.sha}} domzinhuu/ws-qse:latest
+          docker push domzinhuu/qse:latest
+          docker push domzinhuu/ws-qse:latest
+
+      - name: Deploy to Server
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USERNAME }}
+          SCRIPT_AFTER: |
+            docker stop qse
+            docker stop ws-qse
+            docker run --name qse --rm -d -p 3002:3002 domzinhuu/qse:${{steps.generate_sha.outputs.sha}}
+            docker run --name ws-qse --rm -d -p 3333:3333 domzinhuu/ws-qse:${{steps.generate_sha.outputs.sha}}

@@ -2,7 +2,7 @@ import { User } from "@/models/user";
 import { defaultFetchOptions } from "@/utils/request.helper";
 import { socketIo } from "@/ws/socket.io";
 
-const baseUrl = "http://localhost:3333";
+const baseUrl = import.meta.env.VITE_URL_API;
 
 export function doLogin(username: string): User {
   const user: User = {
@@ -44,7 +44,7 @@ export async function createNewRoom(
     body: JSON.stringify({ data, user }),
   };
 
-  const response = await fetch("http://localhost:3333/createRoom", options);
+  const response = await fetch(`${baseUrl}/createRoom`, options);
   const result = await response.json();
 
   return result;
@@ -57,13 +57,13 @@ export async function enterRoom(data: { room: string; password: string }) {
     body: JSON.stringify(data),
   };
 
-  const response = await fetch("http://localhost:3333/enterRoom", options);
+  const response = await fetch(`${baseUrl}/enterRoom`, options);
 
   return response.json();
 }
 
 export async function getGameSession(userId: string, roomName: string) {
-  const url = `http://localhost:3333/getGameSession?userId=${userId}&room=${roomName}`;
+  const url = `${baseUrl}/getGameSession?userId=${userId}&room=${roomName}`;
   const response = await fetch(url, defaultFetchOptions);
 
   if (!response.ok) {
@@ -74,10 +74,7 @@ export async function getGameSession(userId: string, roomName: string) {
 }
 
 export async function getRoomList() {
-  const response = await fetch(
-    "http://localhost:3333/roomList",
-    defaultFetchOptions
-  );
+  const response = await fetch(`${baseUrl}/roomList`, defaultFetchOptions);
   return response.json();
 }
 

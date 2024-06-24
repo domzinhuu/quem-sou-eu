@@ -3,6 +3,7 @@ import { Lobby } from "@/components/lobby";
 import { Navbar } from "@/components/navbar";
 import { SpecTurn } from "@/components/spec-turn";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
 import { YourTurn } from "@/components/your-turn";
 import { getGameSession } from "@/data/services";
 import { useAuth } from "@/hoooks/auth";
@@ -16,6 +17,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 export function GamePage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [game, setGame] = useState<Room>({} as Room);
   const [whoAmI, setWhoAmI] = useState<string>("");
   const [myHistory, setMyHistory] = useState<Question[]>([]);
@@ -40,8 +42,6 @@ export function GamePage() {
 
     socketIo.on("game_updated", (data: Room) => {
       setGame(data || {});
-
-      console.log("game update", data);
       if (data) {
         const player = data.players?.find((p) => p.id === user?.id);
         setMyHistory(player?.questions || []);
@@ -60,12 +60,30 @@ export function GamePage() {
       setWhoAmI(value);
     });
 
+    socketIo.on(
+      "new_player_joined",
+      ({ newPlayerName }: { newPlayerName: string }) => {
+        toast({
+          description: `${newPlayerName} entrou na sala!`,
+        });
+      }
+    );
+
+    socketIo.on("received_vote", ({ playerName, vote }) => {
+      toast({
+        variant: `${vote ? "success" : "destructive"}`,
+        title: `Jogador ${playerName} respondeu...`,
+        description: `${vote ? "SIM" : "NÃO"}`,
+      });
+    });
     return () => {
       socketIo.off("connect");
       socketIo.off("game_update");
       socketIo.off("current_player_count");
       socketIo.off("next_turn");
       socketIo.off("show_whoAmI");
+      socketIo.off("new_player_joined");
+      socketIo.off("received_vote");
     };
   }, []);
 

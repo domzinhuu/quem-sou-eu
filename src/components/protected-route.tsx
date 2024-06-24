@@ -1,4 +1,3 @@
-import { GameProvider } from "@/contexts/game-context";
 import { getSession } from "@/data/services";
 import { PropsWithChildren, useEffect } from "react";
 import { useNavigate } from "react-router";
@@ -13,5 +12,5 @@ export function ProtectedRoute({ children }: ProtectRouteProps) {
     if (logged === null) navigate("/", { replace: true });
   }, [navigate]);
 
-  return <GameProvider>{children}</GameProvider>;
+  return <>{children}</>;
 }

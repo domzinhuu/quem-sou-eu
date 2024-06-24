@@ -23,15 +23,14 @@ const io = new Server(httpServer, {
   },
 });
 
-app.post("/createRoom", (req, res) => {
+app.post("/api/createRoom", (req, res) => {
   const { data, user } = req.body;
   const room = new Room({ ...data, hostId: user.id });
   game.addNewMatch(room);
-
   return res.json({ ok: true, roomId: room.id });
 });
 
-app.post("/enterRoom", (req, res) => {
+app.post("/api/enterRoom", (req, res) => {
   const body = req.body;
   const room = game.rooms.find((r) => r.id === body.room);
 
@@ -43,13 +42,23 @@ app.post("/enterRoom", (req, res) => {
     return res.status(401).json({ error: "senha inválida" });
   }
 
-  if(room.capacity === game.context[body.room].players.length){
-    return res.status(403).json({ error: "Capacidade maxima da sala atingida" });
+  if (room.capacity === game.context[body.room].players.length) {
+    return res
+      .status(403)
+      .json({ error: "Capacidade maxima da sala atingida" });
+  }
+
+  const gameStatus = game.context[room.id].gameStatus;
+
+  if (gameStatus === "running") {
+    return res
+      .status(403)
+      .json({ error: "A partida já começou, aguarde a próxima rodada." });
   }
   return res.status(200).json({ ok: true });
 });
 
-app.post("/startGame", (req, res) => {
+app.post("/api/startGame", (req, res) => {
   const body = req.body;
   const host = game.getRoomPlayer(body.roomId, body.playerId);
 
@@ -66,20 +75,21 @@ app.post("/startGame", (req, res) => {
   return res.status(200).json({ ok: true });
 });
 
-app.post("/nextTurn", (req, res) => {
+app.post("/api/nextTurn", (req, res) => {
   const body = req.body;
   game.nextPlayer(body.roomId);
   return res.status(200).json({ ok: true });
 });
 
-app.post("/removePlayerFromMatch", (req, res) => {
+app.post("/api/removePlayerFromMatch", (req, res) => {
   const body = req.body;
   const playerLeft = game.removePlayerFromMatch(body.roomId, body.playerId);
 
   return res.json({ playerLeft });
 });
 
-app.get("/getGameSession", (req, res) => {
+app.get("/api/getGameSession", (req, res) => {
+  console.log("chegou no getSession");
   const { userId, room } = req.query;
   const gameRoom = game.listRooms.find((r) => r.name === room);
 
@@ -95,13 +105,13 @@ app.get("/getGameSession", (req, res) => {
   const player = context.players.find((p) => p.id === userId);
 
   if (!player) {
-    return res.status(404).json({ error: "You aren't a player in this room" });
+    return res.status(404).json({ error: "Voce nao esta jogando nesta sala!" });
   }
 
   return res.json(context);
 });
 
-app.get("/roomList", (req, res) => {
+app.get("/api/roomList", (req, res) => {
   return res.json(game.listRooms || []);
 });
 
@@ -116,6 +126,9 @@ io.on("connection", (socket) => {
     game.newPlayerJoined(roomId, player);
 
     gameUpdate(io, roomId, game.context[roomId]);
+    socket.to(roomId).emit("new_player_joined", {
+      newPlayerName: player.name,
+    });
   });
 
   socket.on("new_room_created", () => {
@@ -143,6 +156,10 @@ io.on("connection", (socket) => {
   socket.on("emit_vote", ({ roomId, playerId, vote }) => {
     game.giveCurrentPlayerVote(roomId, playerId, vote);
     gameUpdate(io, roomId, game.context[roomId]);
+
+    const player = game.getRoomPlayer(roomId, playerId);
+
+    socket.to(roomId).emit("received_vote", { playerName: player.name, vote });
   });
 
   socket.on("emit_giveAtry", ({ roomId, whoAmI }) => {
@@ -161,9 +178,9 @@ io.on("connection", (socket) => {
     gameUpdate(io, roomId, game.context[roomId]);
   });
 
-  socket.on("emit_close_room", ({ roomId }) => {
+  socket.on("emit_close_room", ({ roomId, playerName }) => {
     socket.leave(roomId);
-
+    io.to(roomId).emit("player_leave_room", { playerName });
     if (game.context[roomId].players.length === 0) {
       const roomSockets = io.sockets.adapter.rooms[roomId]?.sockets || {};
 

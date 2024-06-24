@@ -4,18 +4,22 @@ import { LogOut } from "lucide-react";
 import { useAuth } from "@/hoooks/auth";
 import { backToLobby } from "@/data/services";
 import { closeRoomWS } from "@/data/websocket";
+import { useEffect } from "react";
+import { socketIo } from "@/ws/socket.io";
+import { useToast } from "./ui/use-toast";
 
 interface Props {
   roomId?: string;
 }
 export function Navbar({ roomId }: Props) {
   const { user, logout } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     if (roomId) {
       await backToLobby(roomId, user!.id);
-      closeRoomWS(roomId);
+      closeRoomWS(roomId, user?.name);
       navigate("/home");
       return;
     }
@@ -23,6 +27,18 @@ export function Navbar({ roomId }: Props) {
     logout();
     navigate("/");
   };
+
+  useEffect(() => {
+    socketIo.on(
+      "player_leave_room",
+      ({ playerName }: { playerName: string }) => {
+        toast({
+          variant: "destructive",
+          description: `${playerName} saiu da sala!`,
+        });
+      }
+    );
+  }, []);
   return (
     <div className="flex items-center gap-2 px-4 py-2 justify-end">
       <p className="font-normal">

@@ -1,2 +1,4 @@
 import { io } from "socket.io-client";
-export const socketIo = io("http://localhost:3333");
+const url = import.meta.env.VITE_WS_URL || "http://localhost:3334";
+
+export const socketIo = io(url);

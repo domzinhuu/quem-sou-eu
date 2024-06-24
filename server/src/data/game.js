@@ -269,6 +269,10 @@ class Game {
     return this.context[roomId].players.length;
   }
 
+  getPlayerCounter(roomId) {
+    return this.context[roomId].players.length;
+  }
+
   nextPlayer(roomId) {
     const currentGame = new Context(this.context[roomId]);
     currentGame.setCurrentPlayer();

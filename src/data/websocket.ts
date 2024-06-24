@@ -33,6 +33,6 @@ export function giveATryWS(roomId: string, whoAmI: string) {
   socketIo.emit("emit_giveAtry", { roomId, whoAmI });
 }
 
-export function closeRoomWS(roomId: string) {
-  socketIo.emit("emit_close_room", { roomId });
+export function closeRoomWS(roomId: string, playerName?: string) {
+  socketIo.emit("emit_close_room", { roomId, playerName });
 }
