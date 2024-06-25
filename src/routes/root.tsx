@@ -49,7 +49,7 @@ export function Root() {
           <div className="bg-slate-50 rounded-lg p-4">
             <h2 className="text-2xl font-bold">Preparação do Jogo</h2>
             <p>
-              Cada jogador recebe o nome de um personagem, objeto ou figura.
+              Cada jogador recebe o nome de um objeto.
               Você saberá a identidade de todos os outros jogadores, exceto a
               sua própria.
             </p>

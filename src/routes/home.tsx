@@ -37,7 +37,10 @@ const createRoomSchema = z.object({
     .string({ required_error: "Este campo é obrigatório" })
     .min(4, { message: "Informe um nome com pelo menos 4 caracter" }),
   capacity: z.array(
-    z.number({ coerce: true, required_error: "Este campo é obrigatório" })
+    z
+      .number({ coerce: true, required_error: "Este campo é obrigatório" })
+      .min(2, { message: "O valor mínimo é 2" })
+      .max(30, { message: "O valor máximo é 30" })
   ),
   isSecure: z.boolean(),
   password: z.string(),
@@ -164,7 +167,8 @@ export function Home() {
                         <div className="flex gap-2 items-center">
                           <Slider
                             value={field.value}
-                            max={100}
+                            max={30}
+                            min={2}
                             step={1}
                             onValueChange={(vl) => {
                               field.onChange(vl);
@@ -173,7 +177,8 @@ export function Home() {
                           <Input
                             type="number"
                             id="capacity"
-                            max={100}
+                            max={30}
+                            min={2}
                             className="w-16 text-center"
                             value={field.value[0]}
                             onChange={(val) =>
