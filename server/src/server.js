@@ -18,6 +18,7 @@ app.use(
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
+  path: "/ws/",
   cors: {
     origin: "*",
   },
@@ -27,6 +28,7 @@ app.post("/api/createRoom", (req, res) => {
   const { data, user } = req.body;
   const room = new Room({ ...data, hostId: user.id });
   game.addNewMatch(room);
+
   return res.json({ ok: true, roomId: room.id });
 });
 
@@ -89,7 +91,6 @@ app.post("/api/removePlayerFromMatch", (req, res) => {
 });
 
 app.get("/api/getGameSession", (req, res) => {
-  console.log("chegou no getSession");
   const { userId, room } = req.query;
   const gameRoom = game.listRooms.find((r) => r.name === room);
 
