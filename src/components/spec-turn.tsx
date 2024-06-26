@@ -17,8 +17,8 @@ export function SpecTurn({ game, whoAmI }: Props) {
   };
 
   return (
-    <div className="flex-[1.2] flex justify-evenly flex-col items-center border-r">
-      <h2 className="text-5xl">Agora é a vez de...</h2>
+    <div className="flex-[1.2] gap-8 flex justify-evenly flex-col items-center border-r">
+      <h2 className="text-3xl lg:text-5xl">Agora é a vez de...</h2>
 
       <div className="space-y-2 text-center">
         <p className="text-4xl">{game.currentPlayer?.name}</p>
@@ -26,16 +26,16 @@ export function SpecTurn({ game, whoAmI }: Props) {
       </div>
 
       {!game.currentPlayerQuestion ? (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 p-6">
           <Loader2Icon className="animate-spin" size={36} />
           <p>Aguardando pergunta do jogador...</p>
         </div>
       ) : !game.votes[user!.id] ? (
-        <div className="text-center space-y-6">
+        <div className="text-center space-y-2">
           <p>Responda a pergunta:</p>
           <p className="text-2xl font-semibold">{game.currentPlayerQuestion}</p>
 
-          <div className="w-full flex justify-around px-6 gap-4">
+          <div className="w-full flex justify-around p-6 gap-4">
             <Button
               onClick={() => handleVote(true)}
               className="flex items-center gap-2"
@@ -55,7 +55,7 @@ export function SpecTurn({ game, whoAmI }: Props) {
           </div>
         </div>
       ) : (
-        <div className="w-full flex justify-around px-6 gap-4 animate-pulse">
+        <div className="w-full flex justify-around p-6 gap-4 animate-pulse">
           <p>Aguarde o fim do turno de {game.currentPlayer.name}...</p>
         </div>
       )}

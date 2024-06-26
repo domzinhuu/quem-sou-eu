@@ -40,7 +40,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider>
-      <div className="bg-slate-900 h-screen p-4">
+      <div className="bg-slate-900 min-h-screen p-4">
         <div className="max-w-[1440px]  mx-auto">
           <Header />
           <div className="bg-white rounded-b-lg overflow-hidden">

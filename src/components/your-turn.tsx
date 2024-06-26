@@ -40,7 +40,6 @@ export function YourTurn({ game }: Props) {
   const handleSendQuestion = () => {
     if (question) {
       sendCurrentQuestionWS(game.id, game.currentPlayer.id, question);
-      
     }
   };
 
@@ -62,8 +61,8 @@ export function YourTurn({ game }: Props) {
   }, []);
 
   return (
-    <div className="flex-[1.2] flex justify-evenly flex-col items-center border-r">
-      <h2 className="text-5xl px-4">Agora é a sua vez...</h2>
+    <div className="w-full flex justify-evenly flex-col gap-4 items-center border-r p-4">
+      <h2 className="text-3xl lg:text-5xl px-4">Agora é a sua vez...</h2>
 
       {!game.currentPlayerQuestion && (
         <div className="w-full flex items-center flex-col gap-4 p-4">
@@ -84,7 +83,7 @@ export function YourTurn({ game }: Props) {
 
       <div>
         <p className="p-4">
-          Deseja arriscar um chute?{" "}
+          Deseja arriscar um chute?
           <small>(Lembre-se se errar perde uma vida!)</small>
         </p>
         <Form {...form}>

@@ -129,7 +129,7 @@ export function Home() {
       <div className="gap-2">
         <Navbar />
 
-        <div className="flex p-6 rounded-lg ">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-0 p-6 rounded-lg ">
           <Form {...createRoomForm}>
             <form
               onSubmit={createRoomForm.handleSubmit(handleCreateNewRoom)}
@@ -192,7 +192,7 @@ export function Home() {
                   )}
                 />
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col lg:flex-row lg:gap-0  gap-4 lg:items-center justify-between">
                   <FormField
                     control={createRoomForm.control}
                     name="isSecure"
@@ -208,24 +208,25 @@ export function Home() {
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={createRoomForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem className="grid w-full max-w-sm items-center gap-1.5">
-                        <FormControl>
-                          <Input
-                            disabled={!watchIsSecure}
-                            id="password"
-                            placeholder="Senha"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {watchIsSecure && (
+                    <FormField
+                      control={createRoomForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem className="grid w-full max-w-sm items-center gap-1.5">
+                          <FormControl>
+                            <Input
+                              disabled={!watchIsSecure}
+                              id="password"
+                              placeholder="Senha"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -235,8 +236,9 @@ export function Home() {
             </form>
           </Form>
 
-          <div className="px-6">
-            <Separator orientation="vertical" />
+          <div className="px-0 lg:px-6">
+            <Separator className="hidden lg:block" orientation="vertical" />
+            <Separator className="lg:hidden" orientation="horizontal" />
           </div>
 
           <Form {...enterInRoomForm}>

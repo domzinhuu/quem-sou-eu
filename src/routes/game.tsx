@@ -15,9 +15,15 @@ import { CheckCircle2, HeartIcon, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import errou from "@/assets/errou.mp3";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function GamePage() {
   const { user } = useAuth();
+  const [mobileAction, setMobileAction] = useState<
+    "player" | "match" | "history"
+  >("match");
+
   const { toast } = useToast();
   const [game, setGame] = useState<Room>({} as Room);
   const [whoAmI, setWhoAmI] = useState<string>("");
@@ -104,8 +110,13 @@ export function GamePage() {
   return (
     <>
       <Navbar roomId={game.id} />
-      <div className="flex size-full">
-        <div className="w-96 border-r flex flex-col justify-between">
+      <div className="flex flex-col lg:flex-row min-h-[480px] lg:h-full">
+        <div
+          className={cn(
+            "w-96 border-r hidden  flex-1 lg:flex-[0.7] lg:flex flex-col justify-between",
+            { flex: mobileAction === "player" }
+          )}
+        >
           <div className="px-4 py-2 border-b">
             <h2 className="text-2xl ">Jogadores</h2>
           </div>
@@ -169,18 +180,28 @@ export function GamePage() {
             </div>
           </div>
         </div>
+        
+        <div
+          className={cn("flex-1 lg:flex-[1.2] h-full", {
+            hidden: mobileAction !== "match",
+          })}
+        >
+          {game.gameStatus === "stopped" ? (
+            <Lobby isHost={user?.id === game.hostId} roomId={game.id} />
+          ) : game.gameStatus === "finished" ? (
+            <FinishedLobby game={game} />
+          ) : user?.id === game.currentPlayer?.id ? (
+            <YourTurn game={game} />
+          ) : (
+            <SpecTurn whoAmI={whoAmI} game={game} />
+          )}
+        </div>
 
-        {game.gameStatus === "stopped" ? (
-          <Lobby isHost={user?.id === game.hostId} roomId={game.id} />
-        ) : game.gameStatus === "finished" ? (
-          <FinishedLobby game={game} />
-        ) : user?.id === game.currentPlayer?.id ? (
-          <YourTurn game={game} />
-        ) : (
-          <SpecTurn whoAmI={whoAmI} game={game} />
-        )}
-
-        <div className="flex-1 flex flex-col">
+        <div
+          className={cn("flex-1 lg:flex-[0.7] hidden lg:flex flex-col border-l", {
+            flex: mobileAction === "history",
+          })}
+        >
           <h2 className="px-4 py-2 border-b text-2xl">Histórico</h2>
           <div className="flex-1 h-full">
             <ul className="space-y-4 p-4 overflow-y-auto h-[480px]">
@@ -226,6 +247,30 @@ export function GamePage() {
             </ul>
           </div>
         </div>
+      </div>
+
+      <div className="lg:hidden w-full flex items-center">
+        <Button
+          onClick={() => setMobileAction("player")}
+          className="flex-1 rounded-r-none h-14"
+          variant="outline"
+        >
+          Jogadores
+        </Button>
+        <Button
+          onClick={() => setMobileAction("match")}
+          className="flex-1 rounded-l-none rounded-r-none h-14"
+          variant="outline"
+        >
+          Partida
+        </Button>
+        <Button
+          onClick={() => setMobileAction("history")}
+          className="flex-1 rounded-l-none h-14"
+          variant="outline"
+        >
+          Histórico
+        </Button>
       </div>
     </>
   );
