@@ -170,6 +170,7 @@ io.on("connection", (socket) => {
       const gameOver = game.checkIfGameOver(roomId);
 
       if (!gameOver) {
+        io.to(roomId).emit("wrong_guess", { guess: whoAmI });
         game.nextPlayer(roomId);
       }
     } else {

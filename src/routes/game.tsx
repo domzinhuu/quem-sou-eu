@@ -14,6 +14,7 @@ import { socketIo } from "@/ws/socket.io";
 import { CheckCircle2, HeartIcon, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import errou from "@/assets/errou.mp3";
 
 export function GamePage() {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ export function GamePage() {
   const [myHistory, setMyHistory] = useState<Question[]>([]);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const audio = new Audio(errou);
 
   useEffect(() => {
     const roomName = searchParams.get("room") || "";
@@ -76,6 +78,15 @@ export function GamePage() {
         description: `${vote ? "SIM" : "NÃO"}`,
       });
     });
+
+    socketIo.on("wrong_guess", ({ guess }) => {
+      toast({
+        variant: "info",
+        title: `${user?.name} errou o chute...`,
+        description: `( ${guess} ) foi o palpite!`,
+      });
+      audio.play();
+    });
     return () => {
       socketIo.off("connect");
       socketIo.off("game_update");
@@ -84,6 +95,7 @@ export function GamePage() {
       socketIo.off("show_whoAmI");
       socketIo.off("new_player_joined");
       socketIo.off("received_vote");
+      socketIo.off("wrong_guess");
     };
   }, []);
 
