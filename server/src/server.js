@@ -144,8 +144,11 @@ io.on("connection", (socket) => {
     const currentPlayer = game.context[roomId].currentPlayer;
     if (game.context[roomId]) {
       const whoAmI = game.contextWhoAmIList[roomId][currentPlayer.id];
-      socket.to(roomId).emit("show_whoAmI", whoAmI);
-      socket.to(roomId).emit("listen_current_question", "");
+      socket.broadcast
+        .to(roomId)
+        .except(socket.id)
+        .emit("show_whoAmI", whoAmI);
+      socket.broadcast.emit("listen_current_question", "");
     }
   });
 

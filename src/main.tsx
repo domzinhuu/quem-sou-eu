@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import "./global.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
@@ -38,17 +37,15 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <AuthProvider>
-      <div className="bg-slate-900 min-h-screen p-4">
-        <div className="max-w-[1440px]  mx-auto">
-          <Header />
-          <div className="bg-white rounded-b-lg overflow-hidden">
-            <RouterProvider router={router} />
-          </div>
+  <AuthProvider>
+    <div className="bg-slate-900 min-h-screen p-4">
+      <div className="max-w-[1440px]  mx-auto">
+        <Header />
+        <div className="bg-white rounded-b-lg overflow-hidden">
+          <RouterProvider router={router} />
         </div>
       </div>
-      <Toaster />
-    </AuthProvider>
-  </React.StrictMode>
+    </div>
+    <Toaster />
+  </AuthProvider>
 );

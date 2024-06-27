@@ -180,7 +180,7 @@ export function GamePage() {
             </div>
           </div>
         </div>
-        
+
         <div
           className={cn("flex-1 lg:flex-[1.2] h-full", {
             hidden: mobileAction !== "match",
@@ -198,9 +198,12 @@ export function GamePage() {
         </div>
 
         <div
-          className={cn("flex-1 lg:flex-[0.7] hidden lg:flex flex-col border-l", {
-            flex: mobileAction === "history",
-          })}
+          className={cn(
+            "flex-1 lg:flex-[0.7] hidden lg:flex flex-col border-l",
+            {
+              flex: mobileAction === "history",
+            }
+          )}
         >
           <h2 className="px-4 py-2 border-b text-2xl">Histórico</h2>
           <div className="flex-1 h-full">

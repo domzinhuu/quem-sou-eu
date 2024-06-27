@@ -52,7 +52,6 @@ export function YourTurn({ game }: Props) {
 
     if (res.ok) {
       gameChangedWS(game.id);
-      emitWhoAmIWS(game.id);
     }
   };
 
