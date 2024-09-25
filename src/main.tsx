@@ -36,6 +36,7 @@ const router = createBrowserRouter([
   },
 ]);
 
+console.log('just to run')
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <AuthProvider>
     <div className="bg-slate-900 min-h-screen p-4">
